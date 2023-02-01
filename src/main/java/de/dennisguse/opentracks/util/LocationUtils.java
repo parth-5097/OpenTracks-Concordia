@@ -26,9 +26,10 @@ import de.dennisguse.opentracks.data.models.Distance;
  */
 public class LocationUtils {
 
-    private static final String TAG = LocationUtils.class.getSimpleName();
+   
 
-    
+
+
 
     /**
      * Checks if a given location is a valid (i.e. physically possible) location on Earth.

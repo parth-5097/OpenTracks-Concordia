@@ -2,5 +2,5 @@ projectKey=OpenTracks-Concordia
 serverUrl=http://localhost:9000
 serverVersion=9.8.0.63668
 dashboardUrl=http://localhost:9000/dashboard?id=OpenTracks-Concordia
-ceTaskId=AYYPC9BBS1ghDXckYEh7
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AYYPC9BBS1ghDXckYEh7
+ceTaskId=AYYPEHEwS1ghDXckYEh8
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AYYPEHEwS1ghDXckYEh8

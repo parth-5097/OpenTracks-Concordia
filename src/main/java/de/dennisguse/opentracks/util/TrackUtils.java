@@ -29,9 +29,6 @@ import de.dennisguse.opentracks.data.models.Track;
 
 public class TrackUtils {
 
-    private TrackUtils() {
-    }
-
     public static void updateTrack(Context context, Track track, String name, String category, String description, ContentProviderUtils contentProviderUtils) {
         updateTrack(context, track, name, category, TrackIconUtils.getIconValue(context, category), description, contentProviderUtils);
     }

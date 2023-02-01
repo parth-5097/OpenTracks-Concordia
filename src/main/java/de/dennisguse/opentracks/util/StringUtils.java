@@ -228,7 +228,7 @@ public class StringUtils {
      * @param text the given text
      */
     public static String formatCData(String text) {
-        return "<![CDATA[" + text.replaceAll("]]>", "]]]]><![CDATA[>") + "]]>";
+        return "<![CDATA[" + text.replace("]]>", "]]]]><![CDATA[>") + "]]>";
     }
 
     /**
@@ -255,7 +255,7 @@ public class StringUtils {
      * @return the formatted altitude_m (or null) and it's unit as {@link Pair}
      */
     //TODO altitude_m should be double or a value object
-    public static Pair<String, String> getAltitudeParts(Context context, Float altitude_m, UnitSystem unitSystem) {
+    public static Pair<String, String> getAltitudeParts(Context context, Double ALTITUDE_M, UnitSystem unitSystem) {
         DistanceFormatter formatter = DistanceFormatter.Builder()
                 .setDecimalCount(0)
                 .setThreshold(Double.MAX_VALUE)
@@ -266,7 +266,7 @@ public class StringUtils {
         return formatter.getDistanceParts(distance);
     }
 
-    public static String formatAltitude(Context context, Float altitude_m, UnitSystem unitSystem) {
+    public static String formatAltitude(Context context, Double altitude_m, UnitSystem unitSystem) {
         Pair<String, String> altitudeParts = getAltitudeParts(context, altitude_m, unitSystem);
 
         return context.getString(R.string.altitude_with_unit, altitudeParts.first, altitudeParts.second);

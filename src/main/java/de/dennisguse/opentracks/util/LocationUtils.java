@@ -28,8 +28,7 @@ public class LocationUtils {
 
     private static final String TAG = LocationUtils.class.getSimpleName();
 
-    private LocationUtils() {
-    }
+    
 
     /**
      * Checks if a given location is a valid (i.e. physically possible) location on Earth.

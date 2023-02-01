@@ -95,6 +95,7 @@ public class PermissionRequester {
 
     public static final  PermissionRequester ALL = new PermissionRequester(ALL_PERMISSIONS);
 
+
     public interface RejectedCallback {
         void rejected(PermissionRequester permissionRequester);
     }

@@ -21,12 +21,11 @@ import de.dennisguse.opentracks.util.FileUtils;
 public class ImportViewModel extends AndroidViewModel implements ImportServiceResultReceiver.Receiver {
 
     private static final String TAG = ImportViewModel.class.getSimpleName();
-
-    private MutableLiveData<Summary> importData;
     private final ImportServiceResultReceiver resultReceiver;
     private final Summary summary;
-    private boolean cancel = false;
     private final List<DocumentFile> filesToImport = new ArrayList<>();
+    private MutableLiveData<Summary> importData;
+    private boolean cancel = false;
 
     public ImportViewModel(@NonNull Application application) {
         super(application);
@@ -47,7 +46,7 @@ public class ImportViewModel extends AndroidViewModel implements ImportServiceRe
     }
 
     private void loadData(List<DocumentFile> documentFiles) {
-        List<ArrayList<DocumentFile>> nestedFileList = documentFiles.stream()
+        List<List<DocumentFile>> nestedFileList = documentFiles.stream()
                 .map(FileUtils::getFiles)
                 // TODO flatMap(Collection::stream) fails with ClassCastException; try in the future again
                 .collect(Collectors.toList());
@@ -99,12 +98,12 @@ public class ImportViewModel extends AndroidViewModel implements ImportServiceRe
     }
 
     static class Summary {
+        private final ArrayList<Track.Id> importedTrackIds = new ArrayList<>();
+        private final ArrayList<String> fileErrors = new ArrayList<>();
         private int totalCount;
         private int successCount;
         private int existsCount;
         private int errorCount;
-        private final ArrayList<Track.Id> importedTrackIds = new ArrayList<>();
-        private final ArrayList<String> fileErrors = new ArrayList<>();
 
         public int getTotalCount() {
             return totalCount;

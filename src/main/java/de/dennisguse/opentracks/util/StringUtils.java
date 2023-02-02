@@ -255,7 +255,7 @@ public class StringUtils {
      * @return the formatted altitude_m (or null) and it's unit as {@link Pair}
      */
     //TODO altitude_m should be double or a value object
-    public static Pair<String, String> getAltitudeParts(Context context, Double ALTITUDE_M, UnitSystem unitSystem) {
+    public static Pair<String, String> getAltitudeParts(Context context, Double altitude_m, UnitSystem unitSystem) {
         DistanceFormatter formatter = DistanceFormatter.Builder()
                 .setDecimalCount(0)
                 .setThreshold(Double.MAX_VALUE)

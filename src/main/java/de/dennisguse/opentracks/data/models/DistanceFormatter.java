@@ -28,6 +28,10 @@ public class DistanceFormatter {
         assert unitSystem != null;
     }
 
+    public static Builder Builder() {
+        return new Builder();
+    }
+
     public String formatDistance(Distance distance) {
         if (distance.isInvalid()) {
             return resources.getString(R.string.value_unknown);
@@ -79,10 +83,6 @@ public class DistanceFormatter {
             default:
                 throw new RuntimeException("Not implemented");
         }
-    }
-
-    public static Builder Builder() {
-        return new Builder();
     }
 
     public static class Builder {

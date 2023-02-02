@@ -9,6 +9,21 @@ import de.dennisguse.opentracks.settings.UnitSystem;
 
 public class Distance {
 
+    public static final double MI_TO_M = 1609.344;
+    public static final double M_TO_MI = 1 / MI_TO_M;
+    // multiplication factors for conversion
+    private static final double KM_TO_M = 1000.0;
+    private static final double M_TO_KM = 1 / KM_TO_M;
+    private static final double MI_TO_FT = 5280.0;
+    public static final double M_TO_FT = M_TO_MI * MI_TO_FT;
+    private static final double NAUTICAL_MILE_TO_M = 1852.0;
+    private static final double M_TO_NAUTICAL_MILE = 1 / NAUTICAL_MILE_TO_M;
+    private final double distance_m;
+
+    private Distance(double distance_m) {
+        this.distance_m = distance_m;
+    }
+
     public static Distance of(double distance_m) {
         return new Distance(distance_m);
     }
@@ -68,12 +83,6 @@ public class Distance {
             default:
                 throw new RuntimeException("Not implemented");
         }
-    }
-
-    private final double distance_m;
-
-    private Distance(double distance_m) {
-        this.distance_m = distance_m;
     }
 
     public Distance plus(@NonNull Distance distance) {
@@ -177,17 +186,4 @@ public class Distance {
                 "distance_m=" + distance_m +
                 '}';
     }
-
-    // multiplication factors for conversion
-    private static final double KM_TO_M = 1000.0;
-    private static final double M_TO_KM = 1 / KM_TO_M;
-
-    public static final double MI_TO_M = 1609.344;
-    public static final double M_TO_MI = 1 / MI_TO_M;
-
-    private static final double MI_TO_FT = 5280.0;
-    public static final double M_TO_FT = M_TO_MI * MI_TO_FT;
-
-    private static final double NAUTICAL_MILE_TO_M = 1852.0;
-    private static final double M_TO_NAUTICAL_MILE = 1 / NAUTICAL_MILE_TO_M;
 }

@@ -44,7 +44,7 @@ public class SettingsCustomLayoutEditAdapter extends RecyclerView.Adapter<Recycl
 
         trackStatistics.setTotalDistance(Distance.of(0));
 
-        trackStatistics.setTotalAltitudeGain(0f);
+        trackStatistics.setTotalAltitudeGain((float) 0);
         trackStatistics.setTotalAltitudeLoss(0f);
         Track track = new Track(ZoneOffset.UTC);
         track.setTrackStatistics(trackStatistics);
@@ -58,10 +58,10 @@ public class SettingsCustomLayoutEditAdapter extends RecyclerView.Adapter<Recycl
         demoData = new RecordingData(track, lastTrackPoint, null);
     }
 
-    private RecordingLayout recordingLayout;
     private final Context context;
     private final SettingsCustomLayoutItemClickListener itemClickListener;
     private final Map<String, Callable<StatisticViewHolder<?>>> mapping;
+    private RecordingLayout recordingLayout;
 
 
     public SettingsCustomLayoutEditAdapter(Context context, SettingsCustomLayoutItemClickListener itemClickListener, RecordingLayout recordingLayout) {
@@ -131,6 +131,10 @@ public class SettingsCustomLayoutEditAdapter extends RecyclerView.Adapter<Recycl
         return recordingLayout;
     }
 
+    public interface SettingsCustomLayoutItemClickListener {
+        void onSettingsCustomLayoutItemClicked(@NonNull DataField field);
+    }
+
     private class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         CustomStatsItemBinding viewBinding;
@@ -148,9 +152,5 @@ public class SettingsCustomLayoutEditAdapter extends RecyclerView.Adapter<Recycl
             Optional<DataField> optionalField = recordingLayout.getFields().stream().filter(f -> f.getKey().equals(statTitle)).findFirst();
             optionalField.ifPresent(itemClickListener::onSettingsCustomLayoutItemClicked);
         }
-    }
-
-    public interface SettingsCustomLayoutItemClickListener {
-        void onSettingsCustomLayoutItemClicked(@NonNull DataField field);
     }
 }

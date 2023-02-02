@@ -64,22 +64,15 @@ import de.dennisguse.opentracks.util.FileUtils;
  */
 public class ContentProviderUtils {
 
-    private static final String TAG = ContentProviderUtils.class.getSimpleName();
-
     // The authority (the first part of the URI) for the app's content provider.
     @VisibleForTesting
     public static final String AUTHORITY_PACKAGE = BuildConfig.APPLICATION_ID + ".content";
-
     // The base URI for the app's content provider.
     public static final String CONTENT_BASE_URI = "content://" + AUTHORITY_PACKAGE;
-
+    private static final String TAG = ContentProviderUtils.class.getSimpleName();
     private static final String ID_SEPARATOR = ",";
 
     private final ContentResolver contentResolver;
-
-    public interface ContentProviderSelectionInterface {
-        SelectionData buildSelection();
-    }
 
     public ContentProviderUtils(Context context) {
         contentResolver = context.getContentResolver();
@@ -166,6 +159,92 @@ public class ContentProviderUtils {
             track.setIcon(cursor.getString(iconIndex));
         }
         return track;
+    }
+
+    /**
+     * Fills a {@link TrackPoint} from a cursor.
+     *
+     * @param cursor  the cursor pointing to a trackPoint.
+     * @param indexes the cached trackPoints indexes
+     */
+    static TrackPoint fillTrackPoint(Cursor cursor, CachedTrackPointsIndexes indexes) {
+        Instant time = Instant.ofEpochMilli(cursor.getLong(indexes.timeIndex));
+        TrackPoint trackPoint = new TrackPoint(TrackPoint.Type.getById(cursor.getInt(indexes.typeIndex)), time);
+        trackPoint.setId(new TrackPoint.Id(cursor.getInt(indexes.idIndex)));
+
+        if (!cursor.isNull(indexes.longitudeIndex)) {
+            trackPoint.setLongitude(((double) cursor.getInt(indexes.longitudeIndex)) / 1E6);
+        }
+        if (!cursor.isNull(indexes.latitudeIndex)) {
+            trackPoint.setLatitude(((double) cursor.getInt(indexes.latitudeIndex)) / 1E6);
+        }
+        if (!cursor.isNull(indexes.altitudeIndex)) {
+            trackPoint.setAltitude(Altitude.WGS84.of(cursor.getFloat(indexes.altitudeIndex)));
+        }
+        if (!cursor.isNull(indexes.accuracyIndex)) {
+            trackPoint.setHorizontalAccuracy(Distance.of(cursor.getFloat(indexes.accuracyIndex)));
+        }
+        if (!cursor.isNull(indexes.accuracyVerticalIndex)) {
+            trackPoint.setVerticalAccuracy(Distance.of(cursor.getFloat(indexes.accuracyVerticalIndex)));
+        }
+        if (!cursor.isNull(indexes.speedIndex)) {
+            trackPoint.setSpeed(Speed.of(cursor.getFloat(indexes.speedIndex)));
+        }
+        if (!cursor.isNull(indexes.bearingIndex)) {
+            trackPoint.setBearing(cursor.getFloat(indexes.bearingIndex));
+        }
+
+        if (!cursor.isNull(indexes.sensorHeartRateIndex)) {
+            trackPoint.setHeartRate(cursor.getFloat(indexes.sensorHeartRateIndex));
+        }
+        if (!cursor.isNull(indexes.sensorCadenceIndex)) {
+            trackPoint.setCadence(cursor.getFloat(indexes.sensorCadenceIndex));
+        }
+        if (!cursor.isNull(indexes.sensorDistanceIndex)) {
+            trackPoint.setSensorDistance(Distance.of(cursor.getFloat(indexes.sensorDistanceIndex)));
+        }
+        if (!cursor.isNull(indexes.sensorPowerIndex)) {
+            trackPoint.setPower(cursor.getFloat(indexes.sensorPowerIndex));
+        }
+
+        if (!cursor.isNull(indexes.altitudeGainIndex)) {
+            trackPoint.setAltitudeGain(cursor.getFloat(indexes.altitudeGainIndex));
+        }
+        if (!cursor.isNull(indexes.altitudeLossIndex)) {
+            trackPoint.setAltitudeLoss(cursor.getFloat(indexes.altitudeLossIndex));
+        }
+
+        return trackPoint;
+    }
+
+    public static String formatIdListForUri(Track.Id... trackIds) {
+        long[] ids = new long[trackIds.length];
+        for (int i = 0; i < trackIds.length; i++) {
+            ids[i] = trackIds[i].getId();
+        }
+
+        return formatIdListForUri(ids);
+    }
+
+    /**
+     * Formats an array of IDs as comma separated string value
+     *
+     * @param ids array with IDs
+     * @return comma separated list of ids
+     */
+    private static String formatIdListForUri(long[] ids) {
+        StringBuilder idsPathSegment = new StringBuilder();
+        for (long id : ids) {
+            if (idsPathSegment.length() > 0) {
+                idsPathSegment.append(ID_SEPARATOR);
+            }
+            idsPathSegment.append(id);
+        }
+        return idsPathSegment.toString();
+    }
+
+    public static String[] parseTrackIdsFromUri(Uri url) {
+        return TextUtils.split(url.getLastPathSegment(), ID_SEPARATOR);
     }
 
     @VisibleForTesting
@@ -547,62 +626,6 @@ public class ContentProviderUtils {
         return contentResolver.query(MarkerColumns.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
-    /**
-     * Fills a {@link TrackPoint} from a cursor.
-     *
-     * @param cursor  the cursor pointing to a trackPoint.
-     * @param indexes the cached trackPoints indexes
-     */
-    static TrackPoint fillTrackPoint(Cursor cursor, CachedTrackPointsIndexes indexes) {
-        Instant time = Instant.ofEpochMilli(cursor.getLong(indexes.timeIndex));
-        TrackPoint trackPoint = new TrackPoint(TrackPoint.Type.getById(cursor.getInt(indexes.typeIndex)), time);
-        trackPoint.setId(new TrackPoint.Id(cursor.getInt(indexes.idIndex)));
-
-        if (!cursor.isNull(indexes.longitudeIndex)) {
-            trackPoint.setLongitude(((double) cursor.getInt(indexes.longitudeIndex)) / 1E6);
-        }
-        if (!cursor.isNull(indexes.latitudeIndex)) {
-            trackPoint.setLatitude(((double) cursor.getInt(indexes.latitudeIndex)) / 1E6);
-        }
-        if (!cursor.isNull(indexes.altitudeIndex)) {
-            trackPoint.setAltitude(Altitude.WGS84.of(cursor.getFloat(indexes.altitudeIndex)));
-        }
-        if (!cursor.isNull(indexes.accuracyIndex)) {
-            trackPoint.setHorizontalAccuracy(Distance.of(cursor.getFloat(indexes.accuracyIndex)));
-        }
-        if (!cursor.isNull(indexes.accuracyVerticalIndex)) {
-            trackPoint.setVerticalAccuracy(Distance.of(cursor.getFloat(indexes.accuracyVerticalIndex)));
-        }
-        if (!cursor.isNull(indexes.speedIndex)) {
-            trackPoint.setSpeed(Speed.of(cursor.getFloat(indexes.speedIndex)));
-        }
-        if (!cursor.isNull(indexes.bearingIndex)) {
-            trackPoint.setBearing(cursor.getFloat(indexes.bearingIndex));
-        }
-
-        if (!cursor.isNull(indexes.sensorHeartRateIndex)) {
-            trackPoint.setHeartRate(cursor.getFloat(indexes.sensorHeartRateIndex));
-        }
-        if (!cursor.isNull(indexes.sensorCadenceIndex)) {
-            trackPoint.setCadence(cursor.getFloat(indexes.sensorCadenceIndex));
-        }
-        if (!cursor.isNull(indexes.sensorDistanceIndex)) {
-            trackPoint.setSensorDistance(Distance.of(cursor.getFloat(indexes.sensorDistanceIndex)));
-        }
-        if (!cursor.isNull(indexes.sensorPowerIndex)) {
-            trackPoint.setPower(cursor.getFloat(indexes.sensorPowerIndex));
-        }
-
-        if (!cursor.isNull(indexes.altitudeGainIndex)) {
-            trackPoint.setAltitudeGain(cursor.getFloat(indexes.altitudeGainIndex));
-        }
-        if (!cursor.isNull(indexes.altitudeLossIndex)) {
-            trackPoint.setAltitudeLoss(cursor.getFloat(indexes.altitudeLossIndex));
-        }
-
-        return trackPoint;
-    }
-
     //TODO Only used for file import; might be better to replace it.
     //TODO Rename to bulkInsert
     public int bulkInsertTrackPoint(List<TrackPoint> trackPoints, Track.Id trackId) {
@@ -801,36 +824,6 @@ public class ContentProviderUtils {
         return contentResolver.query(TrackPointsColumns.CONTENT_URI_BY_ID, projection, selection, selectionArgs, sortOrder);
     }
 
-    public static String formatIdListForUri(Track.Id... trackIds) {
-        long[] ids = new long[trackIds.length];
-        for (int i = 0; i < trackIds.length; i++) {
-            ids[i] = trackIds[i].getId();
-        }
-
-        return formatIdListForUri(ids);
-    }
-
-    /**
-     * Formats an array of IDs as comma separated string value
-     *
-     * @param ids array with IDs
-     * @return comma separated list of ids
-     */
-    private static String formatIdListForUri(long[] ids) {
-        StringBuilder idsPathSegment = new StringBuilder();
-        for (long id : ids) {
-            if (idsPathSegment.length() > 0) {
-                idsPathSegment.append(ID_SEPARATOR);
-            }
-            idsPathSegment.append(id);
-        }
-        return idsPathSegment.toString();
-    }
-
-    public static String[] parseTrackIdsFromUri(Uri url) {
-        return TextUtils.split(url.getLastPathSegment(), ID_SEPARATOR);
-    }
-
     public SensorStatistics getSensorStats(@NonNull Track.Id trackId) {
         SensorStatistics sensorStatistics = null;
         try (Cursor cursor = contentResolver.query(ContentUris.withAppendedId(TracksColumns.CONTENT_URI_SENSOR_STATS, trackId.getId()), null, null, null, null)) {
@@ -851,5 +844,9 @@ public class ContentProviderUtils {
 
         }
         return sensorStatistics;
+    }
+
+    public interface ContentProviderSelectionInterface {
+        SelectionData buildSelection();
     }
 }
